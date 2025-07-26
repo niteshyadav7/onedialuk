@@ -4,6 +4,9 @@ const { validationResult } = require("express-validator");
 exports.registerValidation = [
   body("name").notEmpty().withMessage("Name is required"),
   body("email").isEmail().withMessage("Valid email is required"),
+  body("phone")
+    .matches(/^[0-9]{10}$/)
+    .withMessage("Valid 10-digit phone number is required"),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),

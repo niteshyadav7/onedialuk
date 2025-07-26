@@ -10,6 +10,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+      match: /^[0-9]{10}$/, // Indian phone format
+    },
     password: {
       type: String,
       required: true,
@@ -37,4 +43,4 @@ userSchema.methods.comparePassword = function (password) {
 };
 
 const User = mongoose.model("User", userSchema);
-module.exports=User;
+module.exports = User;

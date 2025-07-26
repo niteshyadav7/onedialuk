@@ -4,13 +4,13 @@ const generateToken = require("../utils/generateToken");
 const sendMail = require("../utils/sendMail");
 
 exports.register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, phone } = req.body;
 
   try {
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ $or: [{ email }, { phone }] });
     if (user) return res.status(400).json({ message: "Email already exists" });
 
-    user = await User.create({ name, email, password, role });
+    user = await User.create({ name, email, password, role, phone });
     const token = generateToken(user);
 
     res.status(201).json({

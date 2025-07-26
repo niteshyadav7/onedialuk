@@ -1,7 +1,7 @@
 const request = require("supertest");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
-const app = require("../app"); // your Express app
+const app = require("../app"); // Your Express app
 const User = require("../models/user.model");
 
 let mongoServer;
@@ -28,7 +28,8 @@ describe("Auth API Integration", () => {
         name: "Test User",
         email: "test@example.com",
         password: "password123",
-        role: "user",
+        phone: "1234567890",
+        captcha: true
       });
 
       expect(res.statusCode).toBe(201);
@@ -41,12 +42,15 @@ describe("Auth API Integration", () => {
         name: "Test",
         email: "test@example.com",
         password: "password123",
+        phone: "1234567890"
       });
 
       const res = await request(app).post("/api/auth/register").send({
         name: "Test 2",
         email: "test@example.com",
         password: "newpassword",
+        phone: "9876543210",
+        captcha: true
       });
 
       expect(res.statusCode).toBe(400);
@@ -58,6 +62,8 @@ describe("Auth API Integration", () => {
         name: "ShortPass",
         email: "short@example.com",
         password: "123",
+        phone: "9876543210",
+        captcha: true
       });
 
       expect(res.statusCode).toBe(400);
@@ -71,13 +77,15 @@ describe("Auth API Integration", () => {
         name: "Login User",
         email: "login@example.com",
         password: "validpass",
+        phone: "9999999999",
+        captcha: true
       });
     });
 
     it("should login successfully with correct credentials", async () => {
       const res = await request(app).post("/api/auth/login").send({
         email: "login@example.com",
-        password: "validpass",
+        password: "validpass"
       });
 
       expect(res.statusCode).toBe(200);
@@ -88,7 +96,7 @@ describe("Auth API Integration", () => {
     it("should not login with incorrect password", async () => {
       const res = await request(app).post("/api/auth/login").send({
         email: "login@example.com",
-        password: "wrongpass",
+        password: "wrongpass"
       });
 
       expect(res.statusCode).toBe(401);
@@ -98,7 +106,7 @@ describe("Auth API Integration", () => {
     it("should return validation error for invalid email", async () => {
       const res = await request(app).post("/api/auth/login").send({
         email: "bademail",
-        password: "validpass",
+        password: "validpass"
       });
 
       expect(res.statusCode).toBe(400);
@@ -112,6 +120,8 @@ describe("Auth API Integration", () => {
         name: "Forgot User",
         email: "forgot@example.com",
         password: "forgotpass",
+        phone: "1111111111",
+        captcha: true
       });
     });
 
