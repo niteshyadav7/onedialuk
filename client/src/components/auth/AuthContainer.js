@@ -28,7 +28,7 @@ const AuthContainer = () => {
               <br />
               Deals, <span className="text-red-400">Exclusive</span> Offers with
               <br />
-              One Dial USA
+              One Dial UK
             </h1>
           </motion.div>
           <motion.div
