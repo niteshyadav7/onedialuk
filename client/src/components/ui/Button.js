@@ -1,56 +1,52 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 
-const Button = ({
-  children,
-  onClick,
-  type = "button",
+export const Button = ({
   variant = "primary",
-  disabled = false,
-  loading = false,
-  className = "",
   size = "md",
+  isLoading = false,
+  children,
+  className = "",
+  disabled,
+  ...props
 }) => {
   const baseClasses =
-    "relative font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg";
+    "font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2";
 
-  const sizeClasses = {
-    sm: "px-4 py-2 text-sm",
-    md: "px-6 py-3 text-base",
-    lg: "px-8 py-4 text-lg",
-  };
-
-  const variantClasses = {
+  const variants = {
     primary:
-      "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg",
+      "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl",
     secondary:
-      "bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400",
-    ghost:
-      "text-blue-600 hover:text-blue-800 hover:bg-blue-50 focus:ring-blue-300",
+      "bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl",
+    outline:
+      "border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50",
   };
+
+  const sizes = {
+    sm: "px-3 py-2 text-sm",
+    md: "px-4 py-3 text-base",
+    lg: "px-6 py-4 text-lg",
+  };
+
+  const isDisabled = disabled || isLoading;
 
   return (
     <motion.button
-      type={type}
-      onClick={onClick}
-      disabled={disabled || loading}
-      className={`${baseClasses} ${sizeClasses[size]} ${
-        variantClasses[variant]
-      } ${
-        disabled || loading ? "opacity-50 cursor-not-allowed" : ""
-      } ${className}`}
-      whileHover={{ scale: disabled || loading ? 1 : 1.02 }}
-      whileTap={{ scale: disabled || loading ? 1 : 0.98 }}
-      transition={{ duration: 0.1 }}
+      whileHover={!isDisabled ? { scale: 1.02 } : {}}
+      whileTap={!isDisabled ? { scale: 0.98 } : {}}
+      className={`
+        ${baseClasses}
+        ${variants[variant]}
+        ${sizes[size]}
+        ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+        ${className}
+      `}
+      disabled={isDisabled}
+      {...props}
     >
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
-      <span className={loading ? "opacity-0" : "opacity-100"}>{children}</span>
+      {isLoading && <Loader2 className="animate-spin" size={20} />}
+      {children}
     </motion.button>
   );
 };
-
-export default Button;
