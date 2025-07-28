@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login, clearError } from "../../store/slices/authSlice";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
+import { Link } from "react-router-dom";
 
 const LoginForm = ({
   onSwitchToRegister,
@@ -120,24 +121,28 @@ const LoginForm = ({
         </Button>
 
         <div className="text-center">
-          <button
-            type="button"
-            onClick={onSwitchToForgotPassword}
-            className="text-blue-600 hover:text-blue-800 text-sm transition-colors"
-          >
-            Forget password
-          </button>
+          <Link to={"/forgot-password"}>
+            <button
+              type="button"
+              // onClick={onSwitchToForgotPassword}
+              className="text-blue-600 hover:text-blue-800 text-sm transition-colors"
+            >
+              Forget password
+            </button>
+          </Link>
         </div>
 
         <div className="text-center">
           <span className="text-gray-600 text-sm">Not Registered yet? </span>
-          <button
-            type="button"
-            onClick={onSwitchToRegister}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
-          >
-            Join Now
-          </button>
+          <Link to={"/register"}>
+            <button
+              type="button"
+              // onClick={onSwitchToRegister}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+            >
+              Join Now
+            </button>
+          </Link>
         </div>
       </form>
     </div>

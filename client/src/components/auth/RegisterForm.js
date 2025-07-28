@@ -5,6 +5,7 @@ import { register, clearError } from "../../store/slices/authSlice";
 import Input from "../ui/Input";
 import PhoneInput from "../ui/PhoneInput";
 import Button from "../ui/Button";
+import { Link } from "react-router-dom";
 
 const RegisterForm = ({ onSwitchToLogin, userType }) => {
   const [formData, setFormData] = useState({
@@ -164,13 +165,15 @@ const RegisterForm = ({ onSwitchToLogin, userType }) => {
           <span className="text-gray-600 text-sm">
             Already have an account?{" "}
           </span>
-          <button
-            type="button"
-            onClick={onSwitchToLogin}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
-          >
-            Sign In
-          </button>
+          <Link to={"/login"}>
+            <button
+              type="button"
+              // onClick={onSwitchToLogin}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+            >
+              Sign In
+            </button>
+          </Link>
         </div>
       </form>
     </div>
