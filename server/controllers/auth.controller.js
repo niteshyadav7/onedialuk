@@ -4,13 +4,20 @@ const generateToken = require("../utils/generateToken");
 const sendMail = require("../utils/sendMail");
 
 exports.register = async (req, res) => {
-  const { name, email, password, role, phone } = req.body;
+  const { fullName, email, password, role, phone, countryCode } = req.body;
 
   try {
     let user = await User.findOne({ $or: [{ email }, { phone }] });
     if (user) return res.status(400).json({ message: "Email already exists" });
 
-    user = await User.create({ name, email, password, role, phone });
+    user = await User.create({
+      fullName,
+      email,
+      password,
+      role,
+      phone,
+      countryCode,
+    });
     const token = generateToken(user);
 
     res.status(201).json({
@@ -18,9 +25,10 @@ exports.register = async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name,
+        fullName: user.fullName,
         email: user.email,
         role: user.role,
+        countryCode,
       },
     });
   } catch (err) {
@@ -44,7 +52,7 @@ exports.login = async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name,
+        fullName: user.fullName,
         email: user.email,
         role: user.role,
       },

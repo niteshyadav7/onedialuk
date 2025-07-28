@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    fullName: { type: String, required: true },
     email: {
       type: String,
       required: true,
@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      match: /^[0-9]{10}$/, // Indian phone format
     },
     password: {
       type: String,
@@ -25,6 +24,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "business", "admin"],
       default: "user",
+    },
+    countryCode: {
+      type: String,
+      default: "+91",
     },
   },
   { timestamps: true }
