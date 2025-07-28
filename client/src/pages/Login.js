@@ -42,9 +42,9 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex justify-center">
       {/* Left Side - Hero Section */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
+      {/* <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
         <div className="absolute inset-0">
           <div
             className="absolute top-20 left-20 w-32 h-32 bg-blue-500 rounded-full opacity-20"
@@ -96,7 +96,7 @@ export const Login = () => {
             </div>
           </motion.div>
         </div>
-      </div>
+      </div> */}
 
       {/* Right Side - Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">

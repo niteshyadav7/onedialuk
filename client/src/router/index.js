@@ -16,14 +16,14 @@ export const router = createBrowserRouter([
         index: true,
         element: <Navigate to="/login" replace />,
       },
-      {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "register",
-        element: <Register />,
-      },
+      // {
+      //   path: "login",
+      //   element: <Login />,
+      // },
+      // {
+      //   path: "register",
+      //   element: <Register />,
+      // },
       {
         path: "dashboard",
         element: (
@@ -49,5 +49,13 @@ export const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: "login",
+    element: <Login />,
+  },
+  {
+    path: "register",
+    element: <Register />,
   },
 ]);
