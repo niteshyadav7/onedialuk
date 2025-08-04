@@ -8,6 +8,7 @@ import BlogForm from "./components/blogs/BlogForm";
 import Pages from "./pages/Pages";
 import Ads from "./pages/Ads";
 import Settings from "./pages/Settings";
+import LoginPage from "../login/LoginPage";
 
 function App() {
   const handleBlogSave = (blogData) => {
@@ -25,6 +26,8 @@ function App() {
       <div className="App">
         {/* <h1>Hello</h1> */}
         <Routes>
+          
+            <Route path="login" element={<LoginPage />} />
           <Route path="/" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="posts" element={<Posts />} />
