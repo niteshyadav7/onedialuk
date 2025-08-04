@@ -1,44 +1,26 @@
-import React from "react";
-import HeroSection from "./components/Header/HeroSection";
-import ListingCarousel from "./components/Body/ListingCarousal";
-import ManageFreeListing from "./components/Body/ManageFreeListing";
-import ReachLocalCustomers from "./components/Body/ReachLocalCustomers";
-import SimpleStepsSection from "./components/Body/SimpleStepsSection";
-import ReadyToGetStarted from "./components/Body/ReadyToGetStarted";
-import AboutSection from "./components/Body/AboutSection";
-import ServicesSection from "./components/Body/ServiceSection";
-import AppDetailContent from "./components/Body/AppDetailContent";
-import FooterSection from "./components/Footer/FooterSection";
+import { Routes, Route } from "react-router-dom";
+import PageByTitle from "./components/pages/PageByTitle";
+import HomePage from "./components/pages/HomePage";
+import ContactPage from "./components/pages/ContactPage";
+
+// import ServiceContainer from "./components/pages/Test";
+// import Card from "./components/pages/Test";
+// import ExpertiseSection from "./components/pages/Test2";
+import BlogPage from "./components/pages/BlogPage";
+// import BlogPage1 from "./components/pages/Test";
+// import Test from "./components/pages/Test";
+// import AboutPage from "./components/pages/AboutPage";
+// import ButtonList from "./components/pages/Test";
 
 const App = () => {
   return (
     <div className="overflow-x-hidden w-screen">
-      <HeroSection />
-
-      {/* ⬇️ FIRST MAIN — wider layout */}
-      <main className="overflow-auto px-2 sm:px-4 lg:px-10 xl:px-16 mx-auto max-w-full">
-        {" "}
-        {/* ✅ UPDATED */}
-        <div className="flex justify-center items-center bg-white p-8">
-          <h2 className="text-2xl font-bold">The Featured Listings</h2>
-        </div>
-        <ListingCarousel />
-        <ManageFreeListing />
-        <ReachLocalCustomers />
-        <SimpleStepsSection />
-      </main>
-
-      <ReadyToGetStarted />
-
-      {/* ⬇️ SECOND MAIN — wider layout */}
-      <main className="overflow-auto px-2 sm:px-4 lg:px-10 xl:px-16 mx-auto max-w-full">
-        {" "}
-        {/* ✅ UPDATED */}
-        <AboutSection />
-        <ServicesSection />
-        <AppDetailContent />
-        <FooterSection />
-      </main>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/:title" element={<PageByTitle />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/blog" element={<BlogPage />} />
+      </Routes>
     </div>
   );
 };

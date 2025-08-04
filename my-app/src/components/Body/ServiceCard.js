@@ -1,27 +1,65 @@
 import React from "react";
 import { DivideIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const ServiceCard = ({
   icon: Icon = DivideIcon,
   title,
   description,
+  link,
   className = "",
 }) => {
   return (
-    <div
-      className={`bg-white rounded-lg shadow-md p-8 text-center hover:shadow-lg transition-shadow duration-300 ${className}`}
-    >
-      <div className="flex justify-center mb-6">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-          <Icon className="w-8 h-8 text-gray-700" />
+    <div className={`rounded-lg shadow-md p-2  text-center ${className}`}>
+      <div className="flex justify-center mb-3">
+        <div className="w-16 h-16  rounded-full flex items-center justify-center">
+          <Icon className="w-8 h-8 text-white " />
         </div>
       </div>
 
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">{title}</h3>
+      <Link to={link}>
+        <h3 className="text-xl font-semibold text-white mb-4 hover:text-blue-500">
+          {title}
+        </h3>
+      </Link>
 
-      <p className="text-gray-600 leading-relaxed">{description}</p>
+      <p className="text-white leading-relaxed">{description}</p>
     </div>
   );
 };
 
 export default ServiceCard;
+
+// import React from "react";
+// import { DivideIcon } from "lucide-react";
+// import { Link } from "react-router-dom";
+
+// const ServiceCard = ({
+//   icon: Icon = DivideIcon,
+//   title,
+//   description,
+//   link,
+//   className = "",
+// }) => {
+//   return (
+//     <div className={`rounded-lg shadow-md p-6 text-left ${className}`}>
+//       <div className="mb-4">
+//         <Icon className="w-8 h-8 mb-2 text-white" />
+//       </div>
+//       <Link to={link}>
+//         <h3
+//           className={`text-lg font-semibold mb-2 ${
+//             className.includes("text-white") ? "text-white" : "text-[#05164c]"
+//           } hover:text-blue-500 transition`}
+//         >
+//           {title}
+//         </h3>
+//       </Link>
+//       <p className="text-sm leading-relaxed">
+//         {description}
+//       </p>
+//     </div>
+//   );
+// };
+
+// export default ServiceCard;

@@ -59,14 +59,31 @@ const ServicesSection = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* <div className="flex flex-row flex-wrap"> */}
+          {/* {services.map((service) => (
             <ServiceCard
               key={service.id}
               icon={service.icon}
               title={service.title}
               description={service.description}
-              className="hover:scale-105 transform transition-transform duration-300"
+              link={service.link}
+              // className="hover:scale-105 transform transition-transform duration-300"
+              className="bg-[#05164c]"
+            />
+          ))} */}
+          {services.map((service, index) => (
+            <ServiceCard
+              key={service.id}
+              icon={service.icon}
+              title={service.title}
+              description={service.description}
+              link={service.link}
+              className={`${
+                index % 2 === 0
+                  ? "bg-[#05164c] text-white"
+                  : "bg-[#93a7ec] text-[#05164c]"
+              }`}
             />
           ))}
         </div>
