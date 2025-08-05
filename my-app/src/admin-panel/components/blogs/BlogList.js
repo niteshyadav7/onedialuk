@@ -40,17 +40,12 @@ const BlogList = () => {
 
   const getCategoryName = (categoryId) => {
     const category = categories.find((cat) => cat._id === categoryId);
-    // console.log(categories.find((cat) => cat._id == categoryId));
-    // console.log(category?.name);
-    if (category) {
-      console.log(category.name);
-    }
 
     let name;
     if (category) {
       name = category.name;
     } else {
-      name = "XXXXXX";
+      name = "Unknown";
     }
     return name;
   };
