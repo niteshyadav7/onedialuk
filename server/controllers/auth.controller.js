@@ -1,5 +1,6 @@
-const User = require("../models/user.model");
+// const User = require("../models/user.model");
 const generateToken = require("../utils/generateToken");
+const User = require("../models/user.model");
 // const { validationResult } = require("express-validator");
 const sendMail = require("../utils/sendMail");
 

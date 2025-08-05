@@ -15,6 +15,14 @@ const protect = (req, res, next) => {
   }
 };
 
+exports.isAdmin = (req, res, next) => {
+  // Example: assume `req.user.role` is already populated by auth middleware
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ success: false, message: 'Admin access only' });
+  }
+  next();
+};
+
 const authorize =
   (...roles) =>
   (req, res, next) => {
