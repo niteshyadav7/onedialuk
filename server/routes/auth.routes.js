@@ -22,16 +22,14 @@ router.post(
   handleValidation,
   forgotPassword
 );
-// router.get("/test", protect, (req, res) => {
-//   console.log(req.body)
-//   res.send("Done from protected");
 
-// });
-// router.get("/testX", (req, res) => {
-//   res.send("Done");
-// });
-// router.get("/testXY", authorize, (req, res) => {
-//   res.send("Done from the authorization");
-// });
+// /api/auth/register//post
+// /api/auth/login//post
+// /api/categories/createCategory //post
+// /api/categories/getAllCategories//get
+// /api/categories/updateCategoryBySlug/:slug  //put
+// /api/sub-category/createSubCategory //post
+// /api/sub-category/getAllSubCategories //get
+// /api/sub-category/updateSubCategoryBySlug //put
 
 module.exports = router;

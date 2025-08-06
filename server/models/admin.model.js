@@ -22,8 +22,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "business", "admin"],
-      default: "user",
+      enum: ["admin"],
+      default: "admin",
     },
     countryCode: {
       type: String,
@@ -45,5 +45,5 @@ userSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+const Admin = mongoose.model("Admin", userSchema);
+module.exports = Admin;

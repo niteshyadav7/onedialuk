@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const { validateCategory } = require("../validations/category.validation");
-const { isAdminAuthenticated } = require("../middlewares/admin.middleware");
+const {
+  validateCreateCategory,
+  validateUpdateCategory,
+} = require("../validations/category.validation");
+
 const {
   createCategory,
   getAllCategories,
@@ -10,15 +13,20 @@ const {
   updateCategoryBySlug,
   deleteCategoryBySlug,
 } = require("../controllers/category.controller");
+const { isAdminAuthenticated } = require("../middlewares/admin.middleware");
 
-router.post("/", isAdminAuthenticated, validateCategory, createCategory);
+// Public
 router.get("/", getAllCategories);
-router.get("/:id", getCategoryBySlug);
+router.get("/:slug", getCategoryBySlug);
+
+// Protected (Admin only)
+router.post("/", isAdminAuthenticated, validateCreateCategory, createCategory);
 router.put(
-  "/:id",
+  "/:slug",
   isAdminAuthenticated,
-  validateCategory,
+  validateUpdateCategory,
   updateCategoryBySlug
 );
-router.delete("/:id", isAdminAuthenticated, deleteCategoryBySlug);
+router.delete("/:slug", isAdminAuthenticated, deleteCategoryBySlug);
+
 module.exports = router;

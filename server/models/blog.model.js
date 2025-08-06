@@ -6,21 +6,33 @@ const blogSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true },
     content: { type: String, required: true },
     image: { type: String },
+
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: false,
+      required: true,
     },
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory",
+      default: false,
+    },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: false,
+      ref: "Admin",
+      required: true,
     },
 
     status: {
       type: String,
       enum: ["active", "inactive"],
       default: "active",
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
     deletedAt: {
       type: Date,

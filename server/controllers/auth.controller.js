@@ -1,6 +1,6 @@
-// const User = require("../models/user.model");
+// const Admin = require("../models/user.model");
 const generateToken = require("../utils/generateToken");
-const User = require("../models/user.model");
+const Admin = require("../models/admin.model");
 // const { validationResult } = require("express-validator");
 const sendMail = require("../utils/sendMail");
 
@@ -8,10 +8,10 @@ exports.register = async (req, res) => {
   const { fullName, email, password, role, phone, countryCode } = req.body;
 
   try {
-    let user = await User.findOne({ $or: [{ email }, { phone }] });
+    let user = await Admin.findOne({ $or: [{ email }, { phone }] });
     if (user) return res.status(400).json({ message: "Email already exists" });
 
-    user = await User.create({
+    user = await Admin.create({
       fullName,
       email,
       password,
@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
     const token = generateToken(user);
 
     res.status(201).json({
-      message: "User registered successfully",
+      message: "Admin registered successfully",
       token,
       user: {
         id: user._id,
@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await Admin.findOne({ email });
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
@@ -70,8 +70,8 @@ exports.forgotPassword = async (req, res) => {
 
   const { email } = req.body;
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await Admin.findOne({ email });
+    if (!user) return res.status(404).json({ message: "Admin not found" });
 
     const token = generateToken(user);
 

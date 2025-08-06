@@ -1,19 +1,34 @@
 const express = require("express");
-const { validateBlog } = require("../validations/blog.validation");
 const router = express.Router();
+
 const {
   createBlog,
-  getAllBlogs,
   getBlogBySlug,
-  updateBlogBySlug,
+  getAllBlogs,
   deleteBlogBySlug,
+  updateBlogBySlug,
 } = require("../controllers/blog.controller");
+
+
+const {
+  validateCreateBlog,
+  validateUpdateBlog,
+} = require("../validations/blog.validation");
+
 const { isAdminAuthenticated } = require("../middlewares/admin.middleware");
 
-router.post("/", isAdminAuthenticated, validateBlog, createBlog);
+// Public Routes
 router.get("/", getAllBlogs);
 router.get("/:slug", getBlogBySlug);
-router.put("/:slug", isAdminAuthenticated, validateBlog, updateBlogBySlug);
+
+// Admin-Protected Routes
+router.post("/", isAdminAuthenticated, validateCreateBlog, createBlog);
+router.put(
+  "/:slug",
+  isAdminAuthenticated,
+  validateUpdateBlog,
+  updateBlogBySlug
+);
 router.delete("/:slug", isAdminAuthenticated, deleteBlogBySlug);
 
 module.exports = router;
