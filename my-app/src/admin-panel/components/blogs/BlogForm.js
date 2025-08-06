@@ -1,310 +1,206 @@
+// src/features/blog/BlogForm.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Eye, Upload } from "lucide-react";
-import axios from "axios";
+import { categoryApi } from "../categories/categoryApi";
+import { subCategoryApi } from "../subcategories/subCategoryApi";
+import { blogApi } from "./blogApi"; // NOTE: updated to match your fetch-based blogApi
 
-const BlogForm = () => {
-  const navigate = useNavigate();
-  let { slug } = useParams();
-
-  const isEdit = Boolean(slug);
-
+function BlogForm({ blog, onBack, onSave }) {
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
-    image: "",
-    categoryId: "",
     content: "",
+    image: "",
+    category: "",
+    subCategory: "",
+    status: "active",
   });
 
-  const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchOptions = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/api/categories");
-        const fetched = res?.data?.data ?? [];
-        setCategories(fetched);
+        const [catRes, subRes] = await Promise.all([
+          categoryApi.getAll(),
+          subCategoryApi.getAll(),
+        ]);
+        // console.log(catRes.data[0].name);
+        // console.log(subRes.data[0].name);
+
+        setCategories(catRes?.data);
+        setSubCategories(subRes?.data);
       } catch (err) {
-        console.error("Failed to fetch categories:", err);
-        setCategories([]);
+        setError("Failed to load categories or subcategories.");
       }
     };
+    fetchOptions();
+  }, []);
 
-    const fetchBlog = async () => {
-      try {
-        const res = await axios.get(`http://localhost:8080/api/blogs/${slug}`);
-        const blog = res.data.data;
-        setFormData({
-          title: blog.title,
-          slug: blog.slug,
-          image: blog.image,
-          categoryId: blog.categoryId,
-          content: blog.content,
-        });
-      } catch (err) {
-        console.error("Failed to fetch blog:", err);
-      }
-    };
+  useEffect(() => {
+    if (blog) setFormData(blog);
+  }, [blog]);
 
-    fetchCategories();
-    if (isEdit && slug) fetchBlog();
-  }, [slug, isEdit]);
+  // console.log(categories, subCategories);
 
   const generateSlug = (title) =>
     title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+      .replace(/[^a-z0-9 -]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
 
-  const handleTitleChange = (title) => {
-    setFormData((prev) => ({
-      ...prev,
-      title,
-      slug: generateSlug(title),
-    }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "title") {
+      setFormData({ ...formData, title: value, slug: generateSlug(value) });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const adminToken = localStorage.getItem("token");
-
+    setError("");
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      };
-
-      if (isEdit) {
-        await axios.put(
-          `http://localhost:8080/api/blogs/${slug}`,
-          formData,
-          config
-        );
+      if (blog) {
+        await blogApi.update(blog.slug, formData);
       } else {
-        await axios.post("http://localhost:8080/api/blogs", formData, config);
+        await blogApi.create(formData);
       }
-
-      navigate("/blogs");
+      onSave(); // callback after save
     } catch (err) {
-      console.error("Failed to save blog:", err);
-      alert(err?.response?.data?.message || "Something went wrong");
+      setError("Failed to save blog.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // console.log(formData);
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate("/blogs")}
-            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900">
-              {isEdit ? "Edit Blog Post" : "Create New Blog Post"}
-            </h2>
-            <p className="text-gray-600 mt-1">
-              {isEdit
-                ? "Update your blog post content"
-                : "Write and publish your new blog post"}
-            </p>
-          </div>
+    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md mt-6">
+      <h2 className="text-2xl font-bold mb-4">
+        {blog ? "Edit Blog" : "Add Blog"}
+      </h2>
+      {error && <p className="text-red-600 mb-2">{error}</p>}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium">Title</label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            required
+            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-        <div className="flex items-center gap-3">
+
+        <div>
+          <label className="block text-sm font-medium">Slug</label>
+          <input
+            type="text"
+            name="slug"
+            value={formData.slug}
+            onChange={handleChange}
+            required
+            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Content</label>
+          <textarea
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            required
+            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Image URL</label>
+          <input
+            type="text"
+            name="image"
+            value={formData.image}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Category</label>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            required
+            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">SubCategory</label>
+          <select
+            name="subCategory"
+            value={formData.subCategory}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Optional: Select SubCategory</option>
+            {subCategories.map((sub) => (
+              <option key={sub._id} value={sub._id}>
+                {sub.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Status</label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div className="flex justify-between pt-4">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isLoading ? "Saving..." : "Save"}
+          </button>
           <button
             type="button"
-            className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            onClick={onBack}
+            className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400"
           >
-            <Eye className="w-4 h-4" />
-            Preview
+            Cancel
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            {isLoading ? "Saving..." : "Save Post"}
-          </button>
-        </div>
-      </div>
-
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-      >
-        {/* Blog Content Section */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
-            {/* Title */}
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Title *
-              </label>
-              <input
-                type="text"
-                id="title"
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter blog post title..."
-                required
-              />
-            </div>
-
-            {/* Slug */}
-            <div>
-              <label
-                htmlFor="slug"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Slug *
-              </label>
-              <input
-                type="text"
-                id="slug"
-                value={formData.slug}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, slug: e.target.value }))
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="blog-post-url-slug"
-                required
-              />
-            </div>
-
-            {/* Content */}
-            <div>
-              <label
-                htmlFor="content"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Content (HTML) *
-              </label>
-              <textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, content: e.target.value }))
-                }
-                rows={20}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-y"
-                placeholder="Write your blog post content in HTML format..."
-                required
-              />
-              <p className="text-sm text-gray-500 mt-1">
-                HTML content for the blog post
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Sidebar Settings */}
-        <div className="space-y-6">
-          {/* Category */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Post Settings
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Category *
-                </label>
-                <select
-                  id="category"
-                  value={formData.categoryId}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      categoryId: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Select category...</option>
-                  {Array.isArray(categories) &&
-                    categories.map((category) => (
-                      <option key={category._id} value={category._id}>
-                        {category.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Image Upload */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Featured Image
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="image"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  id="image"
-                  value={formData.image}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, image: e.target.value }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-
-              {formData.image && (
-                <div className="mt-4">
-                  <img
-                    src={formData.image}
-                    alt="Preview"
-                    className="w-full h-48 object-cover rounded-lg border border-gray-200"
-                  />
-                </div>
-              )}
-
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">
-                  Drag and drop an image here, or click to select
-                </p>
-                <button
-                  type="button"
-                  className="mt-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
-                >
-                  Choose File
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </form>
     </div>
   );
-};
+}
 
 export default BlogForm;
