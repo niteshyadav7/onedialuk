@@ -9,10 +9,11 @@ import Pages from "./pages/Pages";
 import Ads from "./pages/Ads";
 import Settings from "./pages/Settings";
 import LoginPage from "../login/LoginPage";
-// import PrivateRoute from "./components/PrivateRoute";
-import Categories from "./pages/Categories";
 import CategoryForm from "./components/categories/CategoryForm";
 import PrivateRoute from "./components/PrivateRoute.js";
+import CategoriesPage from "./pages/CategoriesPage.js";
+import SubCategoriesPage from "./pages/SubCategoryPage.js";
+// import Test from "./pages/Test.js";
 
 function App() {
   return (
@@ -26,9 +27,11 @@ function App() {
           <Route path="/" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="posts" element={<Posts />} />
-            <Route path="categories" element={<Categories />} />
+            <Route path="categories" element={<CategoriesPage />} />
             <Route path="categories/new" element={<CategoryForm />} />
             <Route path="categories/edit/:id" element={<CategoryForm />} />
+            {/* <Route path="sub-category" element={<Test />} /> */}
+            <Route path="sub-category" element={<SubCategoriesPage />}/>
             <Route path="blogs" element={<BlogList />} />
             <Route path="blogs/create" element={<BlogForm />} />
             <Route path="blogs/edit/:id" element={<BlogForm />} />

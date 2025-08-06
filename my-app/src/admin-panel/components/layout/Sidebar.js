@@ -16,6 +16,7 @@ const Sidebar = () => {
     { to: '/', icon: LayoutDashboard, label: 'Dashboard', exact: true },
     { to: '/posts', icon: FileText, label: 'Posts' },
     { to: '/categories', icon: FolderOpen, label: 'Categories' },
+    { to: '/sub-category', icon: FolderOpen, label: 'Sub-Categories' },
     { to: '/blogs', icon: BookOpen, label: 'Blogs' },
     { to: '/pages', icon: FileImage, label: 'Pages' },
     { to: '/ads', icon: Megaphone, label: 'Ads' },

@@ -47,6 +47,7 @@ const BlogList = () => {
     } else {
       name = "Unknown";
     }
+    console.log(name);
     return name;
   };
 
