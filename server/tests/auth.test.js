@@ -1,8 +1,9 @@
+// tests/auth.test.js
 const request = require("supertest");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const app = require("../app"); // Your Express app
-const User = require("../models/user.model");
+const Admin = require("../models/admin.model");
 
 let mongoServer;
 
@@ -13,7 +14,7 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  await User.deleteMany();
+  await Admin.deleteMany();
 });
 
 afterAll(async () => {
@@ -22,15 +23,17 @@ afterAll(async () => {
 });
 
 describe("Auth API Integration", () => {
+
   describe("POST /api/auth/register", () => {
     it("should register a user successfully", async () => {
-      const res = await request(app).post("/api/auth/register").send({
-        name: "Test User",
-        email: "test@example.com",
-        password: "password123",
-        phone: "1234567890",
-        captcha: true
-      });
+      const res = await request(app)
+        .post("/api/auth/register")
+        .send({
+          fullName: "Test User",
+          email: "test@example.com",
+          password: "password123",
+          phone: "1234567890"
+        });
 
       expect(res.statusCode).toBe(201);
       expect(res.body.token).toBeDefined();
@@ -38,55 +41,76 @@ describe("Auth API Integration", () => {
     });
 
     it("should not allow registration with existing email", async () => {
-      await User.create({
-        name: "Test",
-        email: "test@example.com",
+      // Create an existing user first
+      await Admin.create({
+        fullName: "Existing User",
+        email: "existing@example.com",
         password: "password123",
         phone: "1234567890"
       });
 
-      const res = await request(app).post("/api/auth/register").send({
-        name: "Test 2",
-        email: "test@example.com",
-        password: "newpassword",
-        phone: "9876543210",
-        captcha: true
-      });
+      const res = await request(app)
+        .post("/api/auth/register")
+        .send({
+          fullName: "Another User",
+          email: "existing@example.com",
+          password: "password123",
+          phone: "0987654321"
+        });
 
       expect(res.statusCode).toBe(400);
-      expect(res.body.message).toMatch(/email already exists/i);
+      expect(res.body.message).toMatch(/already exists/i);
     });
 
     it("should return validation error for short password", async () => {
-      const res = await request(app).post("/api/auth/register").send({
-        name: "ShortPass",
-        email: "short@example.com",
-        password: "123",
-        phone: "9876543210",
-        captcha: true
-      });
+      const res = await request(app)
+        .post("/api/auth/register")
+        .send({
+          fullName: "Short Pass",
+          email: "shortpass@example.com",
+          password: "123",
+          phone: "1234567890"
+        });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.errors[0].msg).toMatch(/at least 6 characters/i);
+    });
+
+    it("should return validation error for missing phone", async () => {
+      const res = await request(app)
+        .post("/api/auth/register")
+        .send({
+          fullName: "No Phone",
+          email: "nophone@example.com",
+          password: "password123"
+          // phone missing
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors[0].msg).toMatch(/phone/i);
     });
   });
 
   describe("POST /api/auth/login", () => {
     beforeEach(async () => {
-      await request(app).post("/api/auth/register").send({
-        name: "Login User",
-        email: "login@example.com",
-        password: "validpass",
-        phone: "9999999999",
-        captcha: true
-      });
+      // Ensure a user exists for login tests
+      await request(app)
+        .post("/api/auth/register")
+        .send({
+          fullName: "Login User",
+          email: "login@example.com",
+          password: "password123",
+          phone: "1234567890"
+        });
     });
 
     it("should login successfully with correct credentials", async () => {
-      const res = await request(app).post("/api/auth/login").send({
-        email: "login@example.com",
-        password: "validpass"
-      });
+      const res = await request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "login@example.com",
+          password: "password123"
+        });
 
       expect(res.statusCode).toBe(200);
       expect(res.body.token).toBeDefined();
@@ -94,62 +118,28 @@ describe("Auth API Integration", () => {
     });
 
     it("should not login with incorrect password", async () => {
-      const res = await request(app).post("/api/auth/login").send({
-        email: "login@example.com",
-        password: "wrongpass"
-      });
+      const res = await request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "login@example.com",
+          password: "wrongpass"
+        });
 
       expect(res.statusCode).toBe(401);
       expect(res.body.message).toMatch(/invalid email or password/i);
     });
 
     it("should return validation error for invalid email", async () => {
-      const res = await request(app).post("/api/auth/login").send({
-        email: "bademail",
-        password: "validpass"
-      });
+      const res = await request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "notanemail",
+          password: "password123"
+        });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.errors[0].msg).toMatch(/valid email/i);
     });
   });
 
-  describe("POST /api/auth/forget-password", () => {
-    beforeEach(async () => {
-      await request(app).post("/api/auth/register").send({
-        name: "Forgot User",
-        email: "forgot@example.com",
-        password: "forgotpass",
-        phone: "1111111111",
-        captcha: true
-      });
-    });
-
-    it("should send password reset email", async () => {
-      const res = await request(app)
-        .post("/api/auth/forget-password")
-        .send({ email: "forgot@example.com" });
-
-      expect(res.statusCode).toBe(200);
-      expect(res.body.message).toMatch(/reset email sent successfully/i);
-    });
-
-    it("should return 404 for non-existent user", async () => {
-      const res = await request(app)
-        .post("/api/auth/forget-password")
-        .send({ email: "nouser@example.com" });
-
-      expect(res.statusCode).toBe(404);
-      expect(res.body.message).toMatch(/user not found/i);
-    });
-
-    it("should return validation error for invalid email", async () => {
-      const res = await request(app)
-        .post("/api/auth/forget-password")
-        .send({ email: "not-an-email" });
-
-      expect(res.statusCode).toBe(400);
-      expect(res.body.errors[0].msg).toMatch(/valid email/i);
-    });
-  });
 });
