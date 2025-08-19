@@ -15,7 +15,7 @@ const blogSchema = new mongoose.Schema(
     subCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "SubCategory",
-      default: false,
+      default: null,
     },
 
     createdBy: {
